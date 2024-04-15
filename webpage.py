@@ -2,7 +2,6 @@ from flask import Flask, flash, redirect, request, url_for, render_template
 import os
 from werkzeug.utils import secure_filename 
 
-
 UPLOAD_FODLER = 'D:\Program files(x86)\VSCode projects\My Python Projects\11- colorchecker\static\images'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
@@ -14,7 +13,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
            
-@app.route("/")
+@app.route("/",  methods=["GET", "POST"])
 def home():
   return render_template("index.html")
 
@@ -31,10 +30,8 @@ def upload():
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return redirect(url_for('uploaded_file',
+        return redirect(url_for('home',
                                 filename=filename))
-    return render_template("test.html")
-  
   
 
 
