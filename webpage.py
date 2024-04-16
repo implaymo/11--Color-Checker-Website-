@@ -14,7 +14,7 @@ db = SQLAlchemy(model_class=Base)
 
 
 load_dotenv()
-UPLOAD_FODLER = 'static\images'
+UPLOAD_FODLER = 'static/images'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 SECRET_KEY = os.getenv("secret_key")
 
@@ -30,9 +30,6 @@ class ImageStore(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     img_url: Mapped[str] = mapped_column(unique=True)
  
-
-with app.app_context():
-    db.create_all()
 
 
 def allowed_file(filename):
@@ -51,16 +48,28 @@ def upload():
       flash("No file part")
       return redirect(request.url)
     file = request.files['file']
-    print(file)
     if file.filename == '':
       flash('No selected file')
       return redirect(request.url)
     if file and allowed_file(file.filename):
-      print("WE GOT A FILE")
+      try:
+        stored_image_id = 1
+        image = db.get_or_404(ImageStore, stored_image_id)
+        print(image)
+        db.session.delete(image)
+        db.session.commit()
+      except Exception as e:
+        print(f"ERROR: {e}")
+            
       filename = secure_filename(file.filename)
+            
+      new_image = ImageStore(img_url=filename)
+      db.session.add(new_image)
+      db.session.commit()
+      
       file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
       return redirect(url_for('home',
-                              filename=filename))
+                              filename=filename))  
   
 
 
