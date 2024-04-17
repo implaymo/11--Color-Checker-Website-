@@ -54,22 +54,29 @@ def upload():
       flash('No selected file')
       return redirect(request.url)
     if file and allowed_file(file.filename):
-      try:
-        stored_image_id = 1
-        image = db.get_or_404(ImageStore, stored_image_id)
-        db.session.delete(image)
-        db.session.commit()
-      except Exception as e:
-        print(f"ERROR: {e}")
-            
+      delete_image()
       filename = secure_filename(file.filename) 
-      new_image = ImageStore(img_url=filename)
-      db.session.add(new_image)
-      db.session.commit()
+      update_image(filename=filename)
       
       file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
       return redirect(url_for('home',
                               filename=filename))  
+      
+def delete_image():
+  try:
+    stored_image_id = 1
+    image = db.get_or_404(ImageStore, stored_image_id)
+    db.session.delete(image)
+    db.session.commit()
+  except Exception as e:
+    print(f"ERROR: {e}")
+    
+def update_image(filename):
+  new_image = ImageStore(img_url=filename)
+  db.session.add(new_image)
+  db.session.commit()
+
+  
   
 
 
