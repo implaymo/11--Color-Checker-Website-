@@ -55,14 +55,12 @@ def upload():
       try:
         stored_image_id = 1
         image = db.get_or_404(ImageStore, stored_image_id)
-        print(image)
         db.session.delete(image)
         db.session.commit()
       except Exception as e:
         print(f"ERROR: {e}")
             
-      filename = secure_filename(file.filename)
-            
+      filename = secure_filename(file.filename) 
       new_image = ImageStore(img_url=filename)
       db.session.add(new_image)
       db.session.commit()
