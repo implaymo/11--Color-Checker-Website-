@@ -8,6 +8,8 @@ from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 import cv2 
 import numpy as np
+import webcolors as wb
+from webcolors import rgb_to_name
 
 class Base(DeclarativeBase):
   pass
@@ -41,9 +43,8 @@ def allowed_file(filename):
 @app.route("/",  methods=["GET", "POST"])
 def home():
   image = db.get_or_404(ImageStore, 1)
-  print(image.img_url)
-  check_image_colors(image=f"static/images/{image.img_url}")
-  return render_template("index.html", image=image)
+  top_5_colors = check_image_colors(image=f"static/images/{image.img_url}", N=5)
+  return render_template("index.html", image=image, top_5_colors=top_5_colors)
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
@@ -78,15 +79,29 @@ def update_image(filename):
   db.session.add(new_image)
   db.session.commit()
   
-def check_image_colors(image):
+def check_image_colors(image, N):
   check_image = cv2.imread(image)
-  image_rgb = cv2.cvtColor(check_image, cv2.COLOR_BGR2RGB)
-  
-  pixel_values = image_rgb[0,0]
-  
-  print("Color values of the first pixel:", pixel_values)
-  
-  
+  if check_image is None:
+    return None
+  else:
+    image_rgb = cv2.cvtColor(check_image, cv2.COLOR_BGR2RGB)
+      
+    unqc,C = np.unique(image_rgb.reshape(-1,image_rgb.shape[-1]), axis=0, return_counts=True)
+    top_n_idx = np.argpartition(C,-N)[-N:]
+    total_pixels = np.sum(C)
+    
+    top_n_idx = np.argsort(C)[-N:][::-1]
+    
+    top_colors = unqc[top_n_idx]
+    top_counts = C[top_n_idx]
+    
+    top_n_colors = []
+    for color, count in zip(top_colors, top_counts):
+      percentage = round((count / total_pixels) * 100, 2)
+      color_code = '#{0:02x}{1:02x}{2:02x}'.format(*color)
+      top_n_colors.append((color_code, percentage))
+    
+    return top_n_colors
 
 
 

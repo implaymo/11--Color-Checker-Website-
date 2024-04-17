@@ -18,15 +18,20 @@
 			<header id="header">
 				<div class="">
 					<h1><a href="#">Upload an Image</a></h1>
-					<p>Just a simple, single page responsive<br />
-					template brought to you by <a href="http://html5up.net">HTML5 UP</a></p>
 					<ul class="">
-						<li>Coffee</li>
-						<li>Tea</li>
-						<li>Milk</li>
+						{% if top_5_colors %}
+						{% for color_tuple in top_5_colors %}
+							<li>Color: {{ color_tuple[0] }}, Percentage: {{ color_tuple[1] }}%</li>
+						{% endfor %}
+						{% else %}
+						<li>UPLOAD AN IMAGE TO SEE THE COLORS</li>
+						{% endif %}
 					</ul>
+
 				</div>
+				{% if image %}
 				<div class="image phone"><div class="inner"><img src="/static/images/{{ image.img_url }}" alt="" /></div></div>
+				{% endif %}
 				<form action="{{ url_for('upload') }}"method=post enctype=multipart/form-data>
 					<input type=file name=file>
 					<input type=submit value=Upload>
