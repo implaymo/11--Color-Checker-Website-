@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
+import cv2 
+import numpy as np
 
 class Base(DeclarativeBase):
   pass
@@ -40,6 +42,7 @@ def allowed_file(filename):
 def home():
   image = db.get_or_404(ImageStore, 1)
   print(image.img_url)
+  check_image_colors(image=f"static/images/{image.img_url}")
   return render_template("index.html", image=image)
 
 @app.route("/upload", methods=["GET", "POST"])
@@ -57,7 +60,6 @@ def upload():
       delete_image()
       filename = secure_filename(file.filename) 
       update_image(filename=filename)
-      
       file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
       return redirect(url_for('home',
                               filename=filename))  
@@ -75,7 +77,14 @@ def update_image(filename):
   new_image = ImageStore(img_url=filename)
   db.session.add(new_image)
   db.session.commit()
-
+  
+def check_image_colors(image):
+  check_image = cv2.imread(image)
+  image_rgb = cv2.cvtColor(check_image, cv2.COLOR_BGR2RGB)
+  
+  pixel_values = image_rgb[0,0]
+  
+  print("Color values of the first pixel:", pixel_values)
   
   
 
