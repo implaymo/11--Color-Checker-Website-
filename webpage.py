@@ -38,7 +38,9 @@ def allowed_file(filename):
            
 @app.route("/",  methods=["GET", "POST"])
 def home():
-  return render_template("index.html")
+  image = db.get_or_404(ImageStore, 1)
+  print(image.img_url)
+  return render_template("index.html", image=image)
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
