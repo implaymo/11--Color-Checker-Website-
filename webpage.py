@@ -56,7 +56,7 @@ def upload():
     file = request.files['file']
     if file.filename == '':
       flash('No selected file')
-      return redirect(request.url)
+      return redirect(url_for("home"))
     if file and allowed_file(file.filename):
       delete_image()
       filename = secure_filename(file.filename) 

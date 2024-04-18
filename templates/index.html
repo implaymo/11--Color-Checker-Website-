@@ -18,24 +18,25 @@
 			<header id="header">
 				<div class="">
 					<h1><a href="#">Upload an Image</a></h1>
-					<ul class="">
-						{% if top_5_colors %}
-						{% for color_tuple in top_5_colors %}
-							<li>Color: {{ color_tuple[0] }}, Percentage: {{ color_tuple[1] }}%</li>
-						{% endfor %}
-						{% else %}
-						<li>UPLOAD AN IMAGE TO SEE THE COLORS</li>
-						{% endif %}
-					</ul>
+					<form action="{{ url_for('upload') }}"method=post enctype=multipart/form-data>
+						<input type=file name=file>
+						<input type=submit value=Upload>
+					</form>
+					{% if image %}
+						<div class="image phone"><div class="inner"><img src="/static/images/{{ image.img_url }}" alt="" /></div></div>
+					{% endif %}					
 
 				</div>
-				{% if image %}
-				<div class="image phone"><div class="inner"><img src="/static/images/{{ image.img_url }}" alt="" /></div></div>
-				{% endif %}
-				<form action="{{ url_for('upload') }}"method=post enctype=multipart/form-data>
-					<input type=file name=file>
-					<input type=submit value=Upload>
-				</form>
+				<ul class="">
+					{% if top_5_colors %}
+					{% for color_tuple in top_5_colors %}
+						<li>Color: {{ color_tuple[0] }}, Percentage: {{ color_tuple[1] }}%</li>
+					{% endfor %}
+					{% else %}
+					<li>UPLOAD AN IMAGE TO SEE THE COLORS</li>
+					{% endif %}
+				</ul>
+
 				
 			</header>
 			
