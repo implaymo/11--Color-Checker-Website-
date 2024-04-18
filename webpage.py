@@ -50,7 +50,6 @@ def home():
 def upload():
   if request.method == "POST":
     if 'file' not in request.files:
-      print("NO FILE")
       flash("No file part")
       return redirect(request.url)
     file = request.files['file']
